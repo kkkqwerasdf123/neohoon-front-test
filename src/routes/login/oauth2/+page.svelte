@@ -3,26 +3,17 @@
     import {page} from "$app/stores";
     import {goto} from "$app/navigation";
     import {onMount} from "svelte";
-    const API_SERVER = import.meta.env.VITE_API_SERVER;
+    import authService from "$lib/service/auth-service.js";
+
+
     const setUserLogin = (accessToken) => {
-        fetch(`${API_SERVER}/api/v1/member/me`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            },
-            credentials: 'include',
-        })
-            .then((response) => {
-                if (response.ok) {
-                    localStorage.setItem('accessToken', accessToken)
-
-
-                    goto('/')
-                }
-            })
+        authService.saveAccessToken(accessToken)
+        authService.loadUser()
     }
 
     onMount(() => {
         setUserLogin($page.url.searchParams.get('accessToken'))
+        goto('/')
     })
 
 </script>

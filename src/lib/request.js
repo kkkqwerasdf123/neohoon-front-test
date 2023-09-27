@@ -1,9 +1,11 @@
+import authService from "$lib/service/auth-service.js";
+
 const API_SERVER = import.meta.env.VITE_API_SERVER;
 
 function handleResponse(response) {
     const authorization = response.headers.get('Authorization');
     if (authorization) {
-        localStorage.setItem('accessToken', authorization);
+        authService.saveAccessToken(authorization)
     }
     if (response.ok) {
         if (isJson(response)) {
@@ -14,7 +16,7 @@ function handleResponse(response) {
     }
 
     if (response.status === 401) {
-        alert(401)
+        authService.logout();
     } else if (response.status === 403) {
         alert(403)
     }

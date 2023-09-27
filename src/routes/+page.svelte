@@ -2,9 +2,12 @@
 
     import authService from "$lib/service/auth-service.js";
     import {request} from "$lib/request.js";
+    import {auth} from "$lib/store/auth.js";
 
     export let username = 'kkkqwerasdf123@naver.com';
     export let password = '1234';
+
+    $: loggedIn = !!$auth;
 
     const handleLogin = () => {
 
@@ -14,7 +17,7 @@
 
         authService.login(username, password)
             .then(() => {
-                alert('OK!')
+                authService.loadUser()
             })
             .catch(err => {
                 console.log(err)
@@ -22,6 +25,10 @@
                     alert(err.detail ?? 'Server Error ......')
                 }
             })
+    }
+
+    const handleLogout = () => {
+        authService.logout()
     }
 
     const authTest = () => {
@@ -45,19 +52,43 @@
 </script>
 
 <main>
-    <label >
-        username: <input type="text" bind:value={username}>
-    </label>
 
-    <label >
-        password: <input type="password" bind:value={password}>
-    </label>
+    {#if loggedIn}
+        <div>
 
-    <button on:click={handleLogin}>Login</button>
+            logged in : {$auth.email}
 
-    <button on:click={authTest}>auth test</button>
-    
+        </div>
+        <div>
+
+            roles: {$auth.authorities}
+
+        </div>
+
+        <button on:click={handleLogout}>Logout</button>
+
+    {:else}
+        <label >
+            username: <input type="text" bind:value={username}>
+        </label>
+
+        <label >
+            password: <input type="password" bind:value={password}>
+        </label>
+
+
+        <button on:click={handleLogin}>Login</button>
+
+        <div>
+            <button on:click={() => {loginByOAuth('kakao')}}>kakao</button>
+            <button on:click={() => {loginByOAuth('naver')}}>naver</button>
+        </div>
+    {/if}
+
+
     <div>
-        <button on:click={() => {loginByOAuth('kakao')}}>kakao</button>
+        <button on:click={authTest}>auth test</button>
     </div>
+
+
 </main>
